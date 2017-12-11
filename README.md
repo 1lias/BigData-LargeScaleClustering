@@ -59,11 +59,11 @@ Definition of the project use case, where the implemented project will be part o
 3. Bringing in additional datasets from stackoverflow, such as user badges, to aid in clustering [up to 5 marks]
 4. Cluster additional datasets (such as posts) [up to 10 marks]
 
-# LEAD DEMONSTRATOR
+## LEAD DEMONSTRATOR
 
 - For specific queries related to this coursework topic, please liaise with Mr/Ms TBD, who will be the lead demonstrator for this project, as well as with the module organiser.
 
-# SUBMISSION GUIDELINES
+## SUBMISSION GUIDELINES
 
 1. The report will have a maximum length of 8 pages, not counting cover page and table of contents.
 2. The report must include motivation of the problem, brief literature survey, explanation of the selected technique, implementation details and discussion of the obtained results, and references used in the work.
