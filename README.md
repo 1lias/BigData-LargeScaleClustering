@@ -10,7 +10,7 @@
 
 - Stack Overflow is the main dataset for this project, but alternative datasets can be adopted after consultation with the module organiser. Additionally, different clustering algorithms may be utilised, but this must be discussed and approved y the module organiser. 
 
-# DATASET
+## DATASET
 
 - The project will use the Stack Overflow dataset. This dataset is located in HDFS at /data/stackoverflow
 The dataset for StackOverflow is a set of files containing Posts, Users, Votes, Comments, PostHistory and PostLinks. Each file contains one XML record per line.
@@ -18,12 +18,12 @@ For complete schema information: Click here
 
 - In order to define the clustering use case, you must define what should be the features of each post that will be used to cluster the data. Have a look at the different fields to define your use case. 
 
-# ALGORITHM
+## ALGORITHM
 - The project will implement the k-means algorithm for clustering. This algorithm iteratively recomputes the location of k centroids (k is the number of clusters, defined beforehand), that aim to classify the data. Points are labelled to the closest centroid, with each iteration updating the centroids location based on all the points labelled with that value.
 
 - Spark and Map/Reduce can be utilised for implementing this problem. Spark is recommended for this task, due to its performance benefits in . However, note that the MLib extension of Spark is not allowed to be used as the primary implementation.  The group must code its own original implementation of the algorithm. However, it is possible to also use the mllib implementation, in order to evaluate the results from  each clustering implementation.
 
-# Report Contents
+## Report Contents
 
 - Brief literature survey on clustering algorithms, including the challenges on implementing them at scale for parallel frameworks. The report should then justify the chosen algorithm (if changed) and the implementation.
 Definition of the project use case, where the implemented project will be part of the solution.
@@ -34,7 +34,7 @@ Definition of the project use case, where the implemented project will be part o
 
 - Experiments demonstrating the technique can successfully group users in the dataset. Representation of the results, and discussion of the findings in a critical manner. 
 
-# ASSESSMENT
+## ASSESSMENT
 
 - The project according to the specification has a base difficulty of 85/100. This means that a perfect implementation and report would get a 85. Additional technical features and experimentation would raise the difficulty in order to opt for a full 100/100 mark.
 
@@ -50,7 +50,7 @@ Definition of the project use case, where the implemented project will be part o
 10. Adequate plots/tables are provided, with captions. [10%] 
 11. Results are not only presented but discussed appropriately. [10%]
 
-# Additional project goals: 
+## Additional project goals: 
 
 - Implementation of additional functions beyond the base specification can raise the base mark up to 100. A non-exhaustive list of expansion ideas include:
 
