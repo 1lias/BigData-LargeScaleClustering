@@ -1,11 +1,14 @@
 import java.util.*;
-
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.*;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import org.apache.hadoop.io.DoubleWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
@@ -20,65 +23,42 @@ public class StackoverflowClustering {
      int iteration = 0;
      boolean clustered = false;
 
-     Path oldCentroidsPath=new Path(output+"/previousCentroids.txt");
-     Path newCentroidsPath = new Path(output+"/currentCentroids.txt");
-
-
-
-
      while(!clustered){
        Job job = Job.getInstance(new Configuration());
        Configuration conf = job.getConfiguration();
 
-        if(iteration == 0){
-             System.out.println(System.getProperty("user.dir"));
-          Writer writer = new BufferedWriter(new OutputStreamWriter(
-              new FileOutputStream(newCentroidsPath.toString())));
+       job.setJarByClass(StackoverflowClustering.class);
+       job.setMapperClass(StackoverflowClusteringMapper.class);
+       job.setReducerClass(StackoverflowClusteringReducer.class);
+       job.setMapOutputKeyClass(DoubleWritable.class);
+       job.setMapOutputValueClass(DoubleWritable.class);
+       job.setOutputKeyClass(DoubleWritable.class);
+       job.setOutputValueClass(NullWritable.class);
+
+       if(iteration == 0){
+         conf.set("C1", "15");
+         conf.set("C2", "25");
+         conf.set("C3", "45");
+         //job.addCacheFile(new Path("/data/companylist.tsv").toUri());
+         FileInputFormat.setInputPaths(job, StringUtils.join(input, ","));
+       }else{
+         Path interPath = new Path(output + "/part-r-00000");
+         FileSystem fs = FileSystem.get(conf);
 
 
-          writer.write("15 30 50");
-        }else{
-          FileChannel src = new FileInputStream(new File(newCentroidsPath.toString())).getChannel();
-          FileChannel dest = new FileOutputStream(new File(oldCentroidsPath.toString())).getChannel();
-          dest.transferFrom(src, 0, src.size());
-        }
-        job.addCacheFile(newCentroidsPath.toUri());
+         BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(interPath)));
+         List<Double> oldCentroids = new ArrayList<Double>();
+         String line = br.readLine();
+         while (line != null) {
+           double centroid = Double.parseDouble(line);
+           oldCentroids.add(centroid);
+           line = br.readLine();
+         }
+         br.close();
+         System.out.println(oldCentroids);
 
-
-
-        job.addCacheFile(newCentroidsPath.toUri());
-        job.setJarByClass(StackoverflowClustering.class);
-
-        job.setReducerClass(StackoverflowClusteringReducer.class);
-        job.setMapperClass(StackoverflowClusteringMapper.class);
-
-        job.setMapOutputKeyClass(DoubleWritable.class);
-    		job.setMapOutputValueClass(DoubleWritable.class);
-
-        job.setOutputKeyClass(DoubleWritable.class);
-        job.setOutputValueClass(DoubleWritable.class);
-
-        job.setNumReduceTasks(0);
-
-
-
-        FileInputFormat.setInputPaths(job, StringUtils.join(input, ","));
-        FileOutputFormat.setOutputPath(job, newCentroidsPath);
-        newCentroidsPath.getFileSystem(conf).delete(newCentroidsPath, true);
-        job.waitForCompletion(true);
-
-
-        //Load old centroids to ArrayList
-        BufferedReader br = new BufferedReader(new FileReader(oldCentroidsPath.toString()));
-        List<Double> oldCentroids = new ArrayList<Double>();
-        String line = br.readLine();
-        if (line != null) {
-          String[] values = line.split(" ");
-          double centroid = Double.parseDouble(values[0]);
-          oldCentroids.add(centroid);
-          line = br.readLine();
-        }
-        br.close();
+         FileInputFormat.setInputPaths(job, StringUtils.join(input, ","));
+       }
 
         //Load new centroids to ArrayList
         br = new BufferedReader(new FileReader(newCentroidsPath.toString()));
@@ -104,9 +84,11 @@ public class StackoverflowClustering {
 				      }
         }
 
-        iteration++;
+
+         ++iteration;
       }
-    }
+
+   }
 
     public static void main(String[] args) throws Exception {
         runJob(Arrays.copyOfRange(args, 0, args.length - 1), args[args.length - 1]);

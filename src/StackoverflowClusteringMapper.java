@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.net.URI;
 import java.util.Calendar;
 import java.util.Hashtable;
-
+import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
 import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
@@ -15,50 +15,20 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 public class StackoverflowClusteringMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
   private Map<String,String> userMap;
-  private ArrayList<DoubleWritable> centroids;
+  private ArrayList<DoubleWritable> centroids = new ArrayList<DoubleWritable>();
   private DoubleWritable age;
 
-  @Override
-  public void setup(Context context)throws IOException,
-                                       InterruptedException{
 
-
-        // We know there is only one cache file, so we only retrieve that URI
-        URI fileUri = context.getCacheFiles()[0];
-
-        FileSystem fs = FileSystem.get(context.getConfiguration());
-        FSDataInputStream in = fs.open(new Path(fileUri));
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-
-        String line = null;
-        try {
-            // we discard the header row
-            br.readLine();
-
-            while ((line = br.readLine()) != null){
-              String[] data = line.split(" ");
-              if(data.length > 0){
-                centroids.add(new DoubleWritable(Double.parseDouble(data[0])));
-              }
-            }
-
-
-            br.close();
-        } catch (IOException e1) {
-        }
-
-        super.setup(context);
-  }
 
   @Override
 	public void map(Object key, Text data, Context context)
                                       throws IOException, InterruptedException {
-    String[] lines = data.toString().split("/t");
+    String[] lines = null;//data.toString().split("/t");
 
-    if(lines.length == 0){
+    if(true){//lines.length == 0){
        int centroidIndex = 0;
        userMap = transformXmlToMap(data.toString());
+       try{
        age = new DoubleWritable(Double.parseDouble(userMap.get("Age")));
        double minDist = centroids.get(0).get() - age.get();
 
@@ -71,7 +41,9 @@ public class StackoverflowClusteringMapper extends Mapper<Object, Text, DoubleWr
         }
       }
       context.write(centroids.get(centroidIndex),age);
-    }else{
+    }catch(NullPointerException e){}
+    }/*else{
+
       age = new DoubleWritable(Double.parseDouble(lines[1]));
       double minDist = centroids.get(0).get() -  age.get();
       int centroidIndex = 0;
@@ -84,8 +56,18 @@ public class StackoverflowClusteringMapper extends Mapper<Object, Text, DoubleWr
         }
       }
       context.write(centroids.get(centroidIndex),age);
-    }
+    }*/
 	}
+
+  @Override
+  protected void setup(Context context)throws IOException,
+                                       InterruptedException{
+
+     Configuration conf = context.getConfiguration();
+     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C1"))));
+     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C2"))));
+     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C3"))));
+  }
 
 
   /*******************************************************************
