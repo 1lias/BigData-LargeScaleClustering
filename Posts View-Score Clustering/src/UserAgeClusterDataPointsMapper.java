@@ -13,7 +13,7 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class StackoverflowClusteringMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
+public class UserAgeClusterDataPointsMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
   private Map<String,String> userMap;
   private ArrayList<DoubleWritable> centroids = new ArrayList<DoubleWritable>();
   private DoubleWritable age;

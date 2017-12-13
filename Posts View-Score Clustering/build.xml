@@ -1,4 +1,4 @@
-<project name="StackoverflowClustering" default="dist" basedir=".">
+<project name="UserAgeClustering" default="dist" basedir=".">
 	<description>
         Sample MapReduce project build file
     </description>
@@ -37,7 +37,7 @@
 		<mkdir dir="${dist}" />
 
 		<!-- Put everything in ${build} into a jar file -->
-		<jar jarfile="${dist}/StackoverflowClustering.jar" basedir="${build}" />
+		<jar jarfile="${dist}/UserAgeClustering.jar" basedir="${build}" />
 	</target>
 
 	<target name="clean" description="clean up">
