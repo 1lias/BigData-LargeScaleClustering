@@ -23,9 +23,7 @@ public class StackoverflowClusteringMapper extends Mapper<Object, Text, DoubleWr
   @Override
 	public void map(Object key, Text data, Context context)
                                       throws IOException, InterruptedException {
-    String[] lines = null;//data.toString().split("/t");
 
-    if(true){//lines.length == 0){
        int centroidIndex = 0;
        userMap = transformXmlToMap(data.toString());
        try{
@@ -42,21 +40,7 @@ public class StackoverflowClusteringMapper extends Mapper<Object, Text, DoubleWr
       }
       context.write(centroids.get(centroidIndex),age);
     }catch(NullPointerException e){}
-    }/*else{
 
-      age = new DoubleWritable(Double.parseDouble(lines[1]));
-      double minDist = centroids.get(0).get() -  age.get();
-      int centroidIndex = 0;
-
-      for(int i = 1; i < centroids.size(); i++){
-        double next = centroids.get(i).get() - age.get();
-        if(Math.abs(next) < Math.abs(minDist)){
-          minDist = next;
-          centroidIndex = i;
-        }
-      }
-      context.write(centroids.get(centroidIndex),age);
-    }*/
 	}
 
   @Override

@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.DoubleWritable;
 
 
-public class StackoverflowClusteringReducer extends Reducer<DoubleWritable, DoubleWritable, DoubleWritable, Text> {
+public class StackoverflowClusteringReducer extends Reducer<DoubleWritable, DoubleWritable, DoubleWritable, NullWritable> {
 
     public void reduce(DoubleWritable centroid,
                        Iterable<DoubleWritable> data, Context context)
@@ -21,7 +21,8 @@ public class StackoverflowClusteringReducer extends Reducer<DoubleWritable, Doub
          numEl++;
        }
 
-       double newCentroid = Math.round(sum / numEl);
+       double newCentroid = Math.round((sum/ numEl * 10.0)) / 10.0;
        context.write(new DoubleWritable(newCentroid), NullWritable.get());
+
     }
 }
