@@ -57,8 +57,8 @@ public class UserAgeClustering {
          while (line != null) {
            double centroid = Double.parseDouble(line);
            oldCentroids.add(centroid);
-           line = br.re
-
+           line = br.readLine();
+         }
          conf.set("C1", oldCentroids.get(0).toString());
          conf.set("C2", oldCentroids.get(1).toString());
          conf.set("C3", oldCentroids.get(2).toString());
