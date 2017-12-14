@@ -1,4 +1,4 @@
-<project name="PostViewScoreClustering" default="dist" basedir=".">
+<project name="PostCommentScoreClustering" default="dist" basedir=".">
 	<description>
         Sample MapReduce project build file
     </description>
@@ -37,7 +37,7 @@
 		<mkdir dir="${dist}" />
 
 		<!-- Put everything in ${build} into a jar file -->
-		<jar jarfile="${dist}/PostViewScoreClustering.jar" basedir="${build}" />
+		<jar jarfile="${dist}/PostCommentScoreClustering.jar" basedir="${build}" />
 	</target>
 
 	<target name="clean" description="clean up">

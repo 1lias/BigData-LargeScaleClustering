@@ -13,7 +13,7 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class UserAgeClusterDataPointsMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
+public class PostCommentScoreDataPointsMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
   private Map<String,String> userMap;
   private ArrayList<DoubleWritable> centroids = new ArrayList<DoubleWritable>();
   private DoubleWritable age;

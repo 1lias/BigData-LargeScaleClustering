@@ -8,7 +8,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.DoubleWritable;
 
 
-public class UserAgeClusterDataPointsReducer extends Reducer<DoubleWritable, DoubleWritable, DoubleWritable, Text> {
+public class PostCommentScoreDataPointsReducer extends Reducer<DoubleWritable, DoubleWritable, DoubleWritable, Text> {
 
     public void reduce(DoubleWritable centroid,
                        Iterable<DoubleWritable> data, Context context)

@@ -13,10 +13,10 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class UserAgeClusteringMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
+public class PostCommentScoreClusteringMapper extends Mapper<Object, Text, DoubleDoublePair, DoubleDoublePair> {
   private Map<String,String> userMap;
-  private ArrayList<DoubleWritable> centroids = new ArrayList<DoubleWritable>();
-  private DoubleWritable age;
+  private ArrayList<DoubleDoublePair> centroids = new ArrayList<DoubleDoublePair>();
+  private DoubleDoublePair commentCount_Score;
 
 
 
@@ -27,18 +27,34 @@ public class UserAgeClusteringMapper extends Mapper<Object, Text, DoubleWritable
        int centroidIndex = 0;
        userMap = transformXmlToMap(data.toString());
        try{
-       age = new DoubleWritable(Double.parseDouble(userMap.get("Age")));
-       double minDist = centroids.get(0).get() - age.get();
+
+       int bodyLength = userMap.get("Body").length();
+       commentCount_Score = new DoubleDoublePair((double)bodyLength,
+                                                 Double.parseDouble(userMap.get("Score")));
+       double centroidX = centroids.get(0).getX().get();
+       double centroidY = centroids.get(0).getY().get();
+
+       double dataPointX = commentCount_Score.getX().get();
+       double dataPointY = commentCount_Score.getY().get();
+
+       double minDist = Math.sqrt(Math.pow(dataPointX-centroidX,2)+
+                                  Math.pow(dataPointY-centroidY,2));
 
 
       for(int i = 1; i < centroids.size(); i++){
-        double next = centroids.get(i).get() - age.get();
+
+        centroidX = centroids.get(i).getX().get();
+        centroidY = centroids.get(i).getY().get();
+
+        double next = Math.sqrt(Math.pow(dataPointX-centroidX,2)+
+                                Math.pow(dataPointY-centroidY,2));
+
         if(Math.abs(next) < Math.abs(minDist)){
           minDist = next;
           centroidIndex = i;
         }
       }
-      context.write(centroids.get(centroidIndex),age);
+      context.write(centroids.get(centroidIndex),commentCount_Score);
     }catch(NullPointerException e){}
 
 	}
@@ -48,9 +64,18 @@ public class UserAgeClusteringMapper extends Mapper<Object, Text, DoubleWritable
                                        InterruptedException{
 
      Configuration conf = context.getConfiguration();
-     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C1"))));
-     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C2"))));
-     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C3"))));
+
+     String[] centroidValues = conf.get("C1").split("\t");
+     centroids.add(new DoubleDoublePair(Double.parseDouble(centroidValues[0]),
+                                        Double.parseDouble(centroidValues[1])));
+
+     centroidValues = conf.get("C2").split("\t");
+     centroids.add(new DoubleDoublePair(Double.parseDouble(centroidValues[0]),
+                                        Double.parseDouble(centroidValues[1])));
+
+     centroidValues = conf.get("C3").split("\t");
+     centroids.add(new DoubleDoublePair(Double.parseDouble(centroidValues[0]),
+                                        Double.parseDouble(centroidValues[1])));
   }
 
 

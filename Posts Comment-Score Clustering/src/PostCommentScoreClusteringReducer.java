@@ -8,21 +8,26 @@ import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.io.DoubleWritable;
 
 
-public class UserAgeClusteringReducer extends Reducer<DoubleWritable, DoubleWritable, DoubleWritable, NullWritable> {
+public class PostCommentScoreClusteringReducer extends Reducer<DoubleDoublePair, DoubleDoublePair, DoubleDoublePair, NullWritable> {
 
-    public void reduce(DoubleWritable centroid,
-                       Iterable<DoubleWritable> data, Context context)
+    public void reduce(DoubleDoublePair centroid,
+                       Iterable<DoubleDoublePair> data, Context context)
 												throws IOException, InterruptedException {
-       double sum = 0;
+       double sumX = 0;
+       double sumY = 0;
        int numEl = 0;
 
-       for(DoubleWritable age : data){
-         sum += age.get();
+       for(DoubleDoublePair commentCount_Score : data){
+         sumX += commentCount_Score.getX().get();
+         sumY += commentCount_Score.getY().get();
          numEl++;
        }
 
-       double newCentroid = Math.round((sum/ numEl * 100.0)) / 100.0;
-       context.write(new DoubleWritable(newCentroid), NullWritable.get());
+       double newCentroidX = sumX / numEl;
+       double newCentroidY = sumY / numEl;
 
+       DoubleDoublePair newCentroid = new  DoubleDoublePair(newCentroidX,newCentroidY);
+
+       context.write(newCentroid, NullWritable.get());
     }
 }

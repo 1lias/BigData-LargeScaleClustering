@@ -15,7 +15,7 @@ import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.mapreduce.lib.output.SequenceFileOutputFormat;
 
-public class UserAgeClustering {
+public class PostCommentScoreClustering {
 
 
 
@@ -48,9 +48,9 @@ public class UserAgeClustering {
          conf.set("C1", "15\t15");
          conf.set("C2", "25\t25");
          conf.set("C3", "45\t45");
-         oldCentroids.add(new DoubleDoublePair(15.0,15.0));
-         oldCentroids.add(new DoubleDoublePair(25.0,25.0));
-         oldCentroids.add(new DoubleDoublePair(45.0,45.0));
+         oldCentroids.add(new DoubleDoublePair(5.0,5.0));
+         oldCentroids.add(new DoubleDoublePair(5.0,100.0));
+         oldCentroids.add(new DoubleDoublePair(100.0,5.0));
        }else{
          br = new BufferedReader(new InputStreamReader(fs.open(interPath)));
          line = br.readLine();
@@ -101,11 +101,11 @@ public class UserAgeClustering {
  			  for (DoubleDoublePair newCentroid : newCentroids) {
 
  				      DoubleDoublePair oldCentroid = iteratorOldCentroids.next();
-              double oldCentroidX = oldCentroid.getX();
-              double oldCentroidY = oldCentroid.getY();
+              double oldCentroidX = oldCentroid.getX().get();
+              double oldCentroidY = oldCentroid.getY().get();
 
-              double newCentroidX = newCentroid.getX();
-              double newCentroidY = newCentroid.getY();
+              double newCentroidX = newCentroid.getX().get();
+              double newCentroidY = newCentroid.getY().get();
 
               double distance= Math.sqrt(Math.pow(newCentroidX-oldCentroidX,2)+Math.pow(newCentroidY-oldCentroidY,2));
 
@@ -122,9 +122,9 @@ public class UserAgeClustering {
          }
           ++iteration;
        }
-       clusterDataPoints(input, output, --iteration);
+       //clusterDataPoints(input, output, --iteration);
     }
-
+/*
     public static void clusterDataPoints(String[] input, String output, int iteration)
                                             throws Exception {
          Job job = Job.getInstance(new Configuration());
@@ -162,7 +162,7 @@ public class UserAgeClustering {
          outputPath.getFileSystem(conf).delete(outputPath, true);
          job.waitForCompletion(true);
 
-    }
+    }*/
 
     public static void main(String[] args) throws Exception {
         runJob(Arrays.copyOfRange(args, 0, args.length - 1), args[args.length - 1]);
