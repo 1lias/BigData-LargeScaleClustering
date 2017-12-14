@@ -31,23 +31,23 @@ public class PostCommentScoreClusteringMapper extends Mapper<Object, Text, Doubl
        int bodyLength = userMap.get("Body").length();
        commentCount_Score = new DoubleDoublePair((double)bodyLength,
                                                  Double.parseDouble(userMap.get("Score")));
-       double centroidX = centroids.get(0).getX().get();
-       double centroidY = centroids.get(0).getY().get();
+       double centroidX = Math.round(centroids.get(0).getX().get()*100.0)/100.0;
+       double centroidY = Math.round(centroids.get(0).getY().get()*100.0)/100.0;
 
-       double dataPointX = commentCount_Score.getX().get();
-       double dataPointY = commentCount_Score.getY().get();
+       double dataPointX = Math.round(commentCount_Score.getX().get()*100.0)/100.0;
+       double dataPointY = Math.round(commentCount_Score.getY().get()*100.0)/100.0;
 
-       double minDist = Math.sqrt(Math.pow(dataPointX-centroidX,2)+
-                                  Math.pow(dataPointY-centroidY,2));
+       double minDist = Math.round(Math.sqrt(Math.pow(dataPointX-centroidX,2)+
+                                  Math.pow(dataPointY-centroidY,2))*100.0)/100.0;
 
 
       for(int i = 1; i < centroids.size(); i++){
 
-        centroidX = centroids.get(i).getX().get();
-        centroidY = centroids.get(i).getY().get();
+        centroidX = Math.round(centroids.get(i).getX().get()*100.0)/100.0;
+        centroidY = Math.round(centroids.get(i).getY().get()*100.0)/100.0;
 
-        double next = Math.sqrt(Math.pow(dataPointX-centroidX,2)+
-                                Math.pow(dataPointY-centroidY,2));
+        double next = Math.round(Math.sqrt(Math.pow(dataPointX-centroidX,2)+
+                                Math.pow(dataPointY-centroidY,2))*100.0)/100.0;
 
         if(Math.abs(next) < Math.abs(minDist)){
           minDist = next;

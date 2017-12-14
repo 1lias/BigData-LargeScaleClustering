@@ -45,12 +45,12 @@ public class PostCommentScoreClustering {
        List<DoubleDoublePair> oldCentroids = new ArrayList<DoubleDoublePair>();
 
        if(iteration == 0){
-         conf.set("C1", "15\t15");
-         conf.set("C2", "25\t25");
-         conf.set("C3", "45\t45");
-         oldCentroids.add(new DoubleDoublePair(5.0,5.0));
-         oldCentroids.add(new DoubleDoublePair(5.0,100.0));
-         oldCentroids.add(new DoubleDoublePair(100.0,5.0));
+         conf.set("C1", "719\t1.8");
+         conf.set("C2", "3216\t2.2");
+         conf.set("C3", "12986\t2.8");
+         oldCentroids.add(new DoubleDoublePair(719.0,1.8));
+         oldCentroids.add(new DoubleDoublePair(3216.0,2.2));
+         oldCentroids.add(new DoubleDoublePair(12986.0,2.8));
        }else{
          br = new BufferedReader(new InputStreamReader(fs.open(interPath)));
          line = br.readLine();
@@ -101,15 +101,15 @@ public class PostCommentScoreClustering {
  			  for (DoubleDoublePair newCentroid : newCentroids) {
 
  				      DoubleDoublePair oldCentroid = iteratorOldCentroids.next();
-              double oldCentroidX = oldCentroid.getX().get();
-              double oldCentroidY = oldCentroid.getY().get();
+              double oldCentroidX = Math.round(oldCentroid.getX().get()*100.0)/100.0;
+              double oldCentroidY = Math.round(oldCentroid.getY().get()*100.0)/100.0;
 
-              double newCentroidX = newCentroid.getX().get();
-              double newCentroidY = newCentroid.getY().get();
+              double newCentroidX = Math.round(newCentroid.getX().get()*100.0)/100.0;
+              double newCentroidY = Math.round(newCentroid.getY().get()*100.0)/100.0;
 
-              double distance= Math.sqrt(Math.pow(newCentroidX-oldCentroidX,2)+Math.pow(newCentroidY-oldCentroidY,2));
+              double distance= Math.round(Math.sqrt(Math.pow(newCentroidX-oldCentroidX,2)+Math.pow(newCentroidY-oldCentroidY,2))*100.0)/100.0;;
 
-              System.out.print(distance);
+              System.out.print(distance+":");
 
  				      if (distance <= 0.1) {
                       System.out.print("True");
@@ -122,9 +122,9 @@ public class PostCommentScoreClustering {
          }
           ++iteration;
        }
-       //clusterDataPoints(input, output, --iteration);
+       clusterDataPoints(input, output, --iteration);
     }
-/*
+
     public static void clusterDataPoints(String[] input, String output, int iteration)
                                             throws Exception {
          Job job = Job.getInstance(new Configuration());
@@ -133,22 +133,27 @@ public class PostCommentScoreClustering {
 
          Path interPath = new Path(output +"/iteration"+iteration+ "/part-r-00000");
 
-         job.setJarByClass(UserAgeClustering.class);
-         job.setMapperClass(UserAgeClusterDataPointsMapper.class);
-         job.setReducerClass(UserAgeClusterDataPointsReducer.class);
-         job.setMapOutputKeyClass(DoubleWritable.class);
-         job.setMapOutputValueClass(DoubleWritable.class);
-         job.setOutputKeyClass(DoubleWritable.class);
+         job.setJarByClass(PostCommentScoreClustering.class);
+         job.setMapperClass(PostCommentScoreDataPointsMapper.class);
+         job.setReducerClass(PostCommentScoreDataPointsReducer.class);
+         job.setMapOutputKeyClass(DoubleDoublePair.class);
+         job.setMapOutputValueClass(DoubleDoublePair.class);
+         job.setOutputKeyClass(DoubleDoublePair.class);
          job.setOutputValueClass(Text.class);
          job.setNumReduceTasks(1);
 
          BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(interPath)));
-         List<Double> centroids = new ArrayList<Double>();
+         List<DoubleDoublePair> centroids = new ArrayList<DoubleDoublePair>();
          String line = br.readLine();
          while (line != null) {
-           double centroid = Double.parseDouble(line);
-           centroids.add(centroid);
+           String[] data = line.split("\t");
+           if(data.length == 2){
+             DoubleDoublePair centroid
+                      = new DoubleDoublePair(Double.parseDouble(data[0]),
+                                             Double.parseDouble(data[1]));
+             centroids.add(centroid);
            line = br.readLine();
+         }
          }
          br.close();
 
@@ -162,7 +167,7 @@ public class PostCommentScoreClustering {
          outputPath.getFileSystem(conf).delete(outputPath, true);
          job.waitForCompletion(true);
 
-    }*/
+    }
 
     public static void main(String[] args) throws Exception {
         runJob(Arrays.copyOfRange(args, 0, args.length - 1), args[args.length - 1]);

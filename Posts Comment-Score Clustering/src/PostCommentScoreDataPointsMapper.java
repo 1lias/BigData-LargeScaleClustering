@@ -13,10 +13,10 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class PostCommentScoreDataPointsMapper extends Mapper<Object, Text, DoubleWritable, DoubleWritable> {
+public class PostCommentScoreDataPointsMapper extends Mapper<Object, Text, DoubleDoublePair, DoubleDoublePair> {
   private Map<String,String> userMap;
-  private ArrayList<DoubleWritable> centroids = new ArrayList<DoubleWritable>();
-  private DoubleWritable age;
+  private ArrayList<DoubleDoublePair> centroids = new ArrayList<DoubleDoublePair>();
+  private DoubleDoublePair commentCount_Score;
 
 
 
@@ -27,18 +27,34 @@ public class PostCommentScoreDataPointsMapper extends Mapper<Object, Text, Doubl
        int centroidIndex = 0;
        userMap = transformXmlToMap(data.toString());
        try{
-       age = new DoubleWritable(Double.parseDouble(userMap.get("Age")));
-       double minDist = centroids.get(0).get() - age.get();
+
+       int bodyLength = userMap.get("Body").length();
+       commentCount_Score = new DoubleDoublePair((double)bodyLength,
+                                                 Double.parseDouble(userMap.get("Score")));
+       double centroidX = Math.round(centroids.get(0).getX().get()*100.0)/100.0;
+       double centroidY = Math.round(centroids.get(0).getY().get()*100.0)/100.0;
+
+       double dataPointX = Math.round(commentCount_Score.getX().get()*100.0)/100.0;
+       double dataPointY = Math.round(commentCount_Score.getY().get()*100.0)/100.0;
+
+       double minDist = Math.round(Math.sqrt(Math.pow(dataPointX-centroidX,2)+
+                                  Math.pow(dataPointY-centroidY,2))*100.0)/100.0;
 
 
       for(int i = 1; i < centroids.size(); i++){
-        double next = centroids.get(i).get() - age.get();
+
+        centroidX = Math.round(centroids.get(i).getX().get()*100.0)/100.0;
+        centroidY = Math.round(centroids.get(i).getY().get()*100.0)/100.0;
+
+        double next = Math.round(Math.sqrt(Math.pow(dataPointX-centroidX,2)+
+                                Math.pow(dataPointY-centroidY,2))*100.0)/100.0;
+
         if(Math.abs(next) < Math.abs(minDist)){
           minDist = next;
           centroidIndex = i;
         }
       }
-      context.write(centroids.get(centroidIndex),age);
+      context.write(centroids.get(centroidIndex),commentCount_Score);
     }catch(NullPointerException e){}
 
 	}
@@ -48,9 +64,18 @@ public class PostCommentScoreDataPointsMapper extends Mapper<Object, Text, Doubl
                                        InterruptedException{
 
      Configuration conf = context.getConfiguration();
-     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C1"))));
-     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C2"))));
-     centroids.add(new DoubleWritable(Double.parseDouble(conf.get("C3"))));
+
+     String[] centroidValues = conf.get("C1").split("\t");
+     centroids.add(new DoubleDoublePair(Double.parseDouble(centroidValues[0]),
+                                        Double.parseDouble(centroidValues[1])));
+
+     centroidValues = conf.get("C2").split("\t");
+     centroids.add(new DoubleDoublePair(Double.parseDouble(centroidValues[0]),
+                                        Double.parseDouble(centroidValues[1])));
+
+     centroidValues = conf.get("C3").split("\t");
+     centroids.add(new DoubleDoublePair(Double.parseDouble(centroidValues[0]),
+                                        Double.parseDouble(centroidValues[1])));
   }
 
 

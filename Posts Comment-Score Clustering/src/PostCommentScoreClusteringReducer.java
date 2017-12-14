@@ -23,8 +23,8 @@ public class PostCommentScoreClusteringReducer extends Reducer<DoubleDoublePair,
          numEl++;
        }
 
-       double newCentroidX = sumX / numEl;
-       double newCentroidY = sumY / numEl;
+       double newCentroidX = Math.round((sumX / numEl)*100.0)/100.0;
+       double newCentroidY = Math.round((sumY / numEl)*100.0)/100.0;
 
        DoubleDoublePair newCentroid = new  DoubleDoublePair(newCentroidX,newCentroidY);
 
