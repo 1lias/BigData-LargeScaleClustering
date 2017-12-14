@@ -13,7 +13,7 @@ import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
-public class PostCommentScoreClusteringMapper extends Mapper<Object, Text, DoubleDoublePair, DoubleDoublePair> {
+public class PostCommentScoreDataPointsMapper extends Mapper<Object, Text, DoubleDoublePair, DoubleDoublePair> {
   private Map<String,String> userMap;
   private ArrayList<DoubleDoublePair> centroids = new ArrayList<DoubleDoublePair>();
   private Hashtable<Integer, Integer> userAgeTable;
@@ -29,11 +29,11 @@ public class PostCommentScoreClusteringMapper extends Mapper<Object, Text, Doubl
        userMap = transformXmlToMap(data.toString());
        try{
 
-       if(userAgeTable.contains(userMap.get("UserID"))){
-       	int age=userAgeTable.get(userMap.get("UserID");
+       if(userAgeTable.contains(userMap.get("UserId"))){
+       	int age=userAgeTable.get(userMap.get("UserId"));
 
-       commentCount_Score = new DoubleDoublePair((double) age),
-                                                 Double.parseDouble(userMap.get("Score");
+       commentCount_Score = new DoubleDoublePair((double) age,
+                                                 Double.parseDouble(userMap.get("BountyAmount")));
        double centroidX = Math.round(centroids.get(0).getX().get()*100.0)/100.0;
        double centroidY = Math.round(centroids.get(0).getY().get()*100.0)/100.0;
 
@@ -84,10 +84,11 @@ protected void setup(Context context) throws IOException, InterruptedException {
 
                 userMap = transformXmlToMap(line.toString());
 
+                try{
+                userAgeTable.put(Integer.parseInt(userMap.get("Id")),
+                                 Integer.parseInt(userMap.get("Age")));
+                                                 }catch(Exception e){}
 
-                athletesTable.put(userMap.get("UserId"), userMap.get("Age"));
-                    
-                
             }
             br.close();
         } catch (IOException e1) {

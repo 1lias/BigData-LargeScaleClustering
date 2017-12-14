@@ -29,11 +29,11 @@ public class PostCommentScoreClusteringMapper extends Mapper<Object, Text, Doubl
        userMap = transformXmlToMap(data.toString());
        try{
 
-       if(userAgeTable.contains(userMap.get("UserID"))){
-       	int age=userAgeTable.get(userMap.get("UserID");
+       if(userAgeTable.contains(userMap.get("UserId"))){
+       	int age=userAgeTable.get(userMap.get("UserId"));
 
-       commentCount_Score = new DoubleDoublePair((double) age),
-                                                 Double.parseDouble(userMap.get("Score");
+       commentCount_Score = new DoubleDoublePair((double) age,
+                                                 Double.parseDouble(userMap.get("BountyAmount")));
        double centroidX = Math.round(centroids.get(0).getX().get()*100.0)/100.0;
        double centroidY = Math.round(centroids.get(0).getY().get()*100.0)/100.0;
 
@@ -43,6 +43,7 @@ public class PostCommentScoreClusteringMapper extends Mapper<Object, Text, Doubl
        double minDist = Math.round(Math.sqrt(Math.pow(dataPointX-centroidX,2)+
                                   Math.pow(dataPointY-centroidY,2))*100.0)/100.0;
 
+      System.out.println(commentCount_Score);
 
       for(int i = 1; i < centroids.size(); i++){
 
@@ -84,10 +85,11 @@ protected void setup(Context context) throws IOException, InterruptedException {
 
                 userMap = transformXmlToMap(line.toString());
 
+                try{
+                userAgeTable.put(Integer.parseInt(userMap.get("Id")),
+                                 Integer.parseInt(userMap.get("Age")));
+                }catch(Exception e){}
 
-                athletesTable.put(userMap.get("UserId"), userMap.get("Age"));
-                    
-                
             }
             br.close();
         } catch (IOException e1) {

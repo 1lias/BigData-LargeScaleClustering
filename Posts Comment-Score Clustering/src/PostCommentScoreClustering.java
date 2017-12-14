@@ -30,7 +30,8 @@ public class PostCommentScoreClustering {
 
        Path interPath = new Path(output +"/iteration"+iteration+ "/part-r-00000");
 
-
+       clusterDataPoints(input, output, 1);
+       System.exit(0);
        job.setJarByClass(PostCommentScoreClustering.class);
        job.setMapperClass(PostCommentScoreClusteringMapper.class);
        job.setReducerClass(PostCommentScoreClusteringReducer.class);
@@ -43,14 +44,14 @@ public class PostCommentScoreClustering {
        BufferedReader br ;
        String line;
        List<DoubleDoublePair> oldCentroids = new ArrayList<DoubleDoublePair>();
-
+//719.58	1.88, 3222.25	2.25, 13018.34	2.89
        if(iteration == 0){
-         conf.set("C1", "719\t1.8");
-         conf.set("C2", "3216\t2.2");
-         conf.set("C3", "12986\t2.8");
-         oldCentroids.add(new DoubleDoublePair(719.0,1.8));
-         oldCentroids.add(new DoubleDoublePair(3216.0,2.2));
-         oldCentroids.add(new DoubleDoublePair(12986.0,2.8));
+         conf.set("C1", "719.58\t1.88");
+         conf.set("C2", "3222.25\t2.25");
+         conf.set("C3", "13018.34\t2.89");
+         oldCentroids.add(new DoubleDoublePair(719.58,1.88));
+         oldCentroids.add(new DoubleDoublePair(3222.25,2.25));
+         oldCentroids.add(new DoubleDoublePair(13018.34,2.89));
        }else{
          br = new BufferedReader(new InputStreamReader(fs.open(interPath)));
          line = br.readLine();
@@ -140,7 +141,7 @@ public class PostCommentScoreClustering {
          job.setMapOutputValueClass(DoubleDoublePair.class);
          job.setOutputKeyClass(DoubleDoublePair.class);
          job.setOutputValueClass(Text.class);
-         job.setNumReduceTasks(1);
+         job.setNumReduceTasks(20);
 
          BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(interPath)));
          List<DoubleDoublePair> centroids = new ArrayList<DoubleDoublePair>();
