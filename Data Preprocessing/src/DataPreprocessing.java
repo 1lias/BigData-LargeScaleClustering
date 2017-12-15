@@ -4,23 +4,24 @@ import org.apache.hadoop.fs.FileSystem;
 import org.apache.commons.lang.StringUtils;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.io.NullWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-public class ExtractSubsetOfPosts {
+public class DataPreprocessing {
 
    public static void runJob(String[] input, String output) throws Exception {
       Job job = Job.getInstance(new Configuration());
       Configuration conf = job.getConfiguration();
 
-      job.setJarByClass(ExtractSubsetOfPosts.class);
-      job.setMapperClass(ExtractSubsetOfPostsMapper.class);
-      job.setReducerClass(ExtractSubsetOfPostsReducer.class);
+      job.setJarByClass(DataPreprocessing.class);
+      job.setMapperClass(DataPreprocessingMapper.class);
+      job.setReducerClass(DataPreprocessingReducer.class);
       job.setMapOutputKeyClass(NullWritable.class);
       job.setMapOutputValueClass(DoubleDoublePair.class);
       job.setOutputKeyClass(NullWritable.class);
-      job.setOutputValueClass(DoubleDoublePair.class);
+      job.setOutputValueClass(Text.class);
 
       Path outputPath = new Path(output);
       FileInputFormat.setInputPaths(job, StringUtils.join(input, ","));
